@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Splash screen — same monogram, centred on a portrait canvas.
+  Convert to assets/splash.png at 1242×2436 (or higher).
+-->
+<svg viewBox="0 0 1242 2688" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1242" height="2688" fill="#09090b"/>
+  <g transform="translate(471 1244)">
+    <rect x="0" y="0" width="60" height="200" rx="14" fill="#10b981"/>
+    <path d="M60 0 H160 a100 100 0 0 1 0 130 H60 V0 Z" fill="#10b981"/>
+  </g>
+  <text x="621" y="1500" text-anchor="middle"
+        font-family="-apple-system, Inter, system-ui"
+        font-weight="700" font-size="42" fill="#a1a1aa">
+    Pulse
+  </text>
+</svg>
