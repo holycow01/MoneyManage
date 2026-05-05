@@ -63,11 +63,11 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/react": "~18.3.12",
+    "@types/react": "~19.1.10",
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.28.0",
     "prettier-plugin-tailwindcss": "^0.6.8",
     "tsx": "^4.19.2",
-    "typescript": "~5.3.3"
+    "typescript": "~5.9.2"
   }
 }
