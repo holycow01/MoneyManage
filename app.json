@@ -7,10 +7,6 @@
     "scheme": "pulse",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "splash": {
-      "resizeMode": "contain",
-      "backgroundColor": "#09090b"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -36,6 +32,13 @@
       "expo-router",
       "expo-font",
       "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#09090b",
+          "resizeMode": "contain"
+        }
+      ],
       [
         "expo-local-authentication",
         {
