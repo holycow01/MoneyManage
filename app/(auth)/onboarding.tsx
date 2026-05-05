@@ -25,6 +25,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import Animated, {
   Extrapolation,
@@ -281,6 +282,7 @@ function SetupSlide({
 }: {
   onFinish: () => void;
 }) {
+  const qc = useQueryClient();
   const [currency, setCurrency] = useState<(typeof CURRENCIES)[number]>("PKR");
   const [name, setName] = useState("Cash");
   const [type, setType] = useState<(typeof ACCOUNT_TYPES)[number]["value"]>(
@@ -318,6 +320,15 @@ function SetupSlide({
         icon: defaultIconFor(type),
       });
       if (e2) throw e2;
+
+      // Invalidate every cache that AuthGate (and the rest of the app)
+      // reads on first render — otherwise the gate sees the stale
+      // "0 accounts" count and bounces us right back to onboarding.
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["accounts"] }),
+        qc.invalidateQueries({ queryKey: ["categories"] }),
+        qc.invalidateQueries({ queryKey: ["me"] }),
+      ]);
 
       onFinish();
     } catch (e: any) {
@@ -469,10 +480,31 @@ function SetupSlide({
               placeholder="0"
               placeholderTextColor="#52525b"
               keyboardType="decimal-pad"
+              clearButtonMode="while-editing"
               accessibilityLabel="Starting balance"
               className="flex-1 text-foreground"
               style={{ fontFamily: "Inter_600SemiBold", fontSize: 18 }}
             />
+            {balanceText.length > 0 ? (
+              <TouchableOpacity
+                onPress={() => setBalanceText("")}
+                hitSlop={10}
+                accessibilityLabel="Clear amount"
+                className="ml-2 h-6 w-6 items-center justify-center rounded-full"
+                style={{ backgroundColor: "#27272a" }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "Inter_700Bold",
+                    fontSize: 12,
+                    color: ZINC_400,
+                    lineHeight: 14,
+                  }}
+                >
+                  ×
+                </Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
           <Text
             className="mt-1"

@@ -348,9 +348,21 @@ export function AccountSheet({
                     placeholder="0"
                     placeholderTextColor="#52525b"
                     keyboardType="decimal-pad"
+                    clearButtonMode="while-editing"
                     className="flex-1 text-foreground"
                     style={{ fontFamily: "Inter_600SemiBold", fontSize: 16 }}
                   />
+                  {startingBalanceText.length > 0 ? (
+                    <TouchableOpacity
+                      onPress={() => setStartingBalanceText("")}
+                      hitSlop={10}
+                      accessibilityLabel="Clear amount"
+                      className="ml-2 h-6 w-6 items-center justify-center rounded-full"
+                      style={{ backgroundColor: "#27272a" }}
+                    >
+                      <Text style={{ fontFamily: "Inter_700Bold", fontSize: 12, color: ZINC_400, lineHeight: 14 }}>×</Text>
+                    </TouchableOpacity>
+                  ) : null}
                 </View>
                 <Text
                   className="mt-1"

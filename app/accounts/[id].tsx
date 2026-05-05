@@ -453,29 +453,52 @@ function Header({
             {formatAmount(delta, currency)} · last 90 days
           </Text>
 
-          <View style={{ height: 100, marginTop: 12 }}>
-            <CartesianChart
-              data={series.map((p, i) => ({ i, value: p.value }))}
-              xKey="i"
-              yKeys={["value"]}
-            >
-              {({ points, chartBounds }) => (
-                <>
-                  <Area
-                    points={points.value}
-                    y0={chartBounds.bottom}
-                    color={account.color}
-                    opacity={0.18}
-                  />
-                  <Line
-                    points={points.value}
-                    color={account.color}
-                    strokeWidth={2}
-                    curveType="cardinal"
-                  />
-                </>
-              )}
-            </CartesianChart>
+          <View style={{ height: 100, marginTop: 12, justifyContent: "center" }}>
+            {(() => {
+              const vals = series
+                .map((p) => p.value)
+                .filter((v) => Number.isFinite(v));
+              const flat =
+                vals.length < 2 || Math.max(...vals) === Math.min(...vals);
+              if (flat) {
+                return (
+                  <Text
+                    style={{
+                      fontFamily: "Inter_500Medium",
+                      fontSize: 12,
+                      color: ZINC_400,
+                      textAlign: "center",
+                    }}
+                  >
+                    No activity yet — add transactions to see history.
+                  </Text>
+                );
+              }
+              return (
+                <CartesianChart
+                  data={series.map((p, i) => ({ i, value: p.value }))}
+                  xKey="i"
+                  yKeys={["value"]}
+                >
+                  {({ points, chartBounds }) => (
+                    <>
+                      <Area
+                        points={points.value}
+                        y0={chartBounds.bottom}
+                        color={account.color}
+                        opacity={0.18}
+                      />
+                      <Line
+                        points={points.value}
+                        color={account.color}
+                        strokeWidth={2}
+                        curveType="cardinal"
+                      />
+                    </>
+                  )}
+                </CartesianChart>
+              );
+            })()}
           </View>
         </View>
       </View>

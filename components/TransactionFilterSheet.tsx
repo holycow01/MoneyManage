@@ -398,19 +398,34 @@ function AmountInput({
   value: number | null;
   onChange: (v: number | null) => void;
 }) {
+  const text = value == null ? "" : String(value);
   return (
-    <TextInput
-      placeholder={placeholder}
-      placeholderTextColor="#52525b"
-      keyboardType="decimal-pad"
-      value={value == null ? "" : String(value)}
-      onChangeText={(t) => {
-        const cleaned = t.replace(/[^\d.]/g, "");
-        onChange(cleaned === "" ? null : Number(cleaned));
-      }}
-      className="flex-1 h-11 px-3 rounded-xl border border-border bg-background text-foreground"
-      style={{ fontFamily: "Inter_500Medium" }}
-    />
+    <View className="flex-1 h-11 flex-row items-center px-3 rounded-xl border border-border bg-background">
+      <TextInput
+        placeholder={placeholder}
+        placeholderTextColor="#52525b"
+        keyboardType="decimal-pad"
+        clearButtonMode="while-editing"
+        value={text}
+        onChangeText={(t) => {
+          const cleaned = t.replace(/[^\d.]/g, "");
+          onChange(cleaned === "" ? null : Number(cleaned));
+        }}
+        className="flex-1 text-foreground"
+        style={{ fontFamily: "Inter_500Medium" }}
+      />
+      {text.length > 0 ? (
+        <TouchableOpacity
+          onPress={() => onChange(null)}
+          hitSlop={10}
+          accessibilityLabel="Clear amount"
+          className="ml-2 h-6 w-6 items-center justify-center rounded-full"
+          style={{ backgroundColor: "#27272a" }}
+        >
+          <Text style={{ fontFamily: "Inter_700Bold", fontSize: 12, color: ZINC_400, lineHeight: 14 }}>×</Text>
+        </TouchableOpacity>
+      ) : null}
+    </View>
   );
 }
 

@@ -1,43 +1,15 @@
 {
   "cli": {
-    "version": ">= 5.0.0",
-    "appVersionSource": "remote"
+    "version": ">= 5.0.0"
   },
   "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "channel": "development",
-      "ios": { "simulator": true },
-      "android": { "buildType": "apk" }
-    },
     "preview": {
       "distribution": "internal",
-      "channel": "preview",
       "ios": { "simulator": false },
       "android": { "buildType": "apk" },
       "env": {
-        "EXPO_PUBLIC_ENV": "preview"
-      }
-    },
-    "production": {
-      "channel": "production",
-      "autoIncrement": true,
-      "env": {
-        "EXPO_PUBLIC_ENV": "production"
-      }
-    }
-  },
-  "submit": {
-    "production": {
-      "ios": {
-        "appleId": "you@example.com",
-        "ascAppId": "0000000000",
-        "appleTeamId": "ABCD123456"
-      },
-      "android": {
-        "serviceAccountKeyPath": "./pc-api-key.json",
-        "track": "internal"
+        "EXPO_PUBLIC_SUPABASE_URL": "https://xnddcisqdsufoxpreunv.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhuZGRjaXNxZHN1Zm94cHJldW52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDU1MzEsImV4cCI6MjA5MzQ4MTUzMX0.cYa9xY3hHZKrey-JyDF4U_KYVGQU-49VZG0KuWyqgmk"
       }
     }
   }

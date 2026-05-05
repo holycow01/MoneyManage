@@ -26,6 +26,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Swipeable } from "react-native-gesture-handler";
+import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import {
   useMutation,
@@ -39,7 +40,14 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { format, startOfDay, endOfDay } from "date-fns";
-import { Check, ChevronDown, Trash2, Wallet } from "lucide-react-native";
+import {
+  Check,
+  ChevronDown,
+  Settings as SettingsIcon,
+  Target,
+  Trash2,
+  Wallet,
+} from "lucide-react-native";
 
 import { supabase } from "@/lib/supabase";
 import { getLucideIcon } from "@/lib/icons";
@@ -90,6 +98,7 @@ type Transaction = {
 // ──────────────────────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const qc = useQueryClient();
+  const router = useRouter();
 
   const expression = useEntryStore((s) => s.expression);
   const amount = useEntryStore((s) => s.amount);
@@ -431,18 +440,59 @@ export default function HomeScreen() {
       >
         {/* 1. Header */}
         <View className="flex-row items-center justify-between px-5 pt-2 pb-3">
-          <Text
-            className="text-foreground text-base"
-            style={{ fontFamily: "Inter_600SemiBold" }}
-          >
-            {format(new Date(), "EEEE, MMM d")}
-          </Text>
-          <Text
-            className="text-muted text-xs"
-            style={{ fontFamily: "Inter_500Medium" }}
-          >
-            Today · {formatAmount(totalToday, currency)}
-          </Text>
+          <View className="flex-1">
+            <Text
+              className="text-foreground text-base"
+              style={{ fontFamily: "Inter_600SemiBold" }}
+            >
+              {format(new Date(), "EEEE, MMM d")}
+            </Text>
+            <Text
+              className="text-muted text-xs mt-0.5"
+              style={{ fontFamily: "Inter_500Medium" }}
+            >
+              Today · {formatAmount(totalToday, currency)}
+            </Text>
+          </View>
+
+          <View className="flex-row" style={{ gap: 8 }}>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.selectionAsync();
+                router.push("/accounts");
+              }}
+              hitSlop={8}
+              accessibilityLabel="Accounts"
+              className="h-9 w-9 items-center justify-center rounded-full bg-card border border-border"
+              activeOpacity={0.85}
+            >
+              <Wallet size={16} color="#a1a1aa" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.selectionAsync();
+                router.push("/budgets");
+              }}
+              hitSlop={8}
+              accessibilityLabel="Budgets"
+              className="h-9 w-9 items-center justify-center rounded-full bg-card border border-border"
+              activeOpacity={0.85}
+            >
+              <Target size={16} color="#a1a1aa" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.selectionAsync();
+                router.push("/settings");
+              }}
+              hitSlop={8}
+              accessibilityLabel="Settings"
+              className="h-9 w-9 items-center justify-center rounded-full bg-card border border-border"
+              activeOpacity={0.85}
+            >
+              <SettingsIcon size={16} color="#a1a1aa" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* 2. Amount display */}

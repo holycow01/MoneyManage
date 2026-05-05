@@ -16,6 +16,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   Pressable,
   Text,
   TouchableOpacity,
@@ -23,17 +24,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import DraggableFlatList, {
-  type RenderItemParams,
-  ScaleDecorator,
-} from "react-native-draggable-flatlist";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import {
   ArrowLeftRight,
   EyeOff,
-  GripVertical,
+  Pencil,
   Plus,
   X,
 } from "lucide-react-native";
@@ -213,16 +210,6 @@ export default function AccountsScreen() {
   );
   const archivedCount = cards.filter((c) => c.archived).length;
 
-  const onDragEnd = useCallback(
-    async ({ data }: { data: AccountCard[] }) => {
-      Haptics.selectionAsync();
-      const ids = data.map((c) => c.id);
-      setOrder(ids);
-      await AsyncStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(ids));
-    },
-    [],
-  );
-
   const openAdd = () => {
     setEditingAccount(null);
     setSheetOpen(true);
@@ -314,19 +301,18 @@ export default function AccountsScreen() {
       ) : orderedCards.length === 0 ? (
         <EmptyState onAdd={openAdd} />
       ) : (
-        <DraggableFlatList
+        <FlatList
           data={orderedCards}
           keyExtractor={(item) => item.id}
-          onDragEnd={onDragEnd}
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32, gap: 12 }}
-          renderItem={(props) => (
+          renderItem={({ item }) => (
             <AccountListItem
-              {...props}
+              item={item}
               currency={currency}
-              onPress={() => router.push(`/accounts/${props.item.id}`)}
-              onLongPress={() => {
+              onPress={() => router.push(`/accounts/${item.id}`)}
+              onEdit={() => {
                 Haptics.selectionAsync();
-                openEdit(props.item);
+                openEdit(item);
               }}
             />
           )}
@@ -373,34 +359,42 @@ export default function AccountsScreen() {
 // ──────────────────────────────────────────────────────────────────────────
 function AccountListItem({
   item,
-  drag,
-  isActive,
   currency,
   onPress,
-  onLongPress,
-}: RenderItemParams<AccountCard> & {
+  onEdit,
+}: {
+  item: AccountCard;
   currency: string;
   onPress: () => void;
-  onLongPress: () => void;
+  onEdit: () => void;
 }) {
   const Icon = getLucideIcon(item.icon);
   const negative = item.effectiveBalance < 0;
 
+  // Only render the sparkline if the values have actual variance —
+  // otherwise Victory Native / Skia divides by zero on the y-domain
+  // and crashes the screen with "value is undefined, expected a number".
+  const sparklineValues = item.sparkline
+    .map((p) => p.value)
+    .filter((v) => Number.isFinite(v));
+  const hasVariance =
+    sparklineValues.length > 1 &&
+    Math.max(...sparklineValues) !== Math.min(...sparklineValues);
+
   return (
-    <ScaleDecorator>
-      <Pressable
-        onPress={onPress}
-        onLongPress={onLongPress}
-        delayLongPress={350}
-        className="rounded-2xl bg-card border border-border overflow-hidden flex-row"
-        style={{
-          opacity: item.archived ? 0.55 : 1,
-          shadowColor: isActive ? item.color : "#000",
-          shadowOpacity: isActive ? 0.5 : 0.2,
-          shadowRadius: isActive ? 14 : 6,
-          elevation: isActive ? 8 : 2,
-        }}
-      >
+    <Pressable
+      onPress={onPress}
+      onLongPress={onEdit}
+      delayLongPress={350}
+      className="rounded-2xl bg-card border border-border overflow-hidden flex-row"
+      style={{
+        opacity: item.archived ? 0.55 : 1,
+        shadowColor: "#000",
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 2,
+      }}
+    >
         {/* Left colour band */}
         <View style={{ width: 4, backgroundColor: item.color }} />
 
@@ -435,8 +429,14 @@ function AccountListItem({
                 {item.archived ? " · Archived" : ""}
               </Text>
             </View>
-            <Pressable onPressIn={drag} hitSlop={10} className="p-1">
-              <GripVertical size={18} color={ZINC_500} />
+            <Pressable
+              onPress={onEdit}
+              hitSlop={10}
+              accessibilityLabel={`Edit ${item.name}`}
+              className="h-8 w-8 items-center justify-center rounded-full mr-1"
+              style={{ backgroundColor: "#27272a" }}
+            >
+              <Pencil size={14} color="#f4f4f5" />
             </Pressable>
           </View>
 
@@ -453,26 +453,36 @@ function AccountListItem({
             >
               {formatAmount(item.effectiveBalance, currency)}
             </Text>
-            <View style={{ width: 90, height: 30, marginLeft: 8 }}>
-              <CartesianChart
-                data={item.sparkline.map((p, i) => ({ i, v: p.value }))}
-                xKey="i"
-                yKeys={["v"]}
-              >
-                {({ points }) => (
-                  <Line
-                    points={points.v}
-                    color={item.color}
-                    strokeWidth={1.5}
-                    curveType="cardinal"
-                  />
-                )}
-              </CartesianChart>
+            <View style={{ width: 90, height: 30, marginLeft: 8, justifyContent: "center" }}>
+              {hasVariance ? (
+                <CartesianChart
+                  data={item.sparkline.map((p, i) => ({ i, v: p.value }))}
+                  xKey="i"
+                  yKeys={["v"]}
+                >
+                  {({ points }) => (
+                    <Line
+                      points={points.v}
+                      color={item.color}
+                      strokeWidth={1.5}
+                      curveType="cardinal"
+                    />
+                  )}
+                </CartesianChart>
+              ) : (
+                <View
+                  style={{
+                    height: 1.5,
+                    backgroundColor: item.color,
+                    opacity: 0.4,
+                    borderRadius: 1,
+                  }}
+                />
+              )}
             </View>
           </View>
         </View>
-      </Pressable>
-    </ScaleDecorator>
+    </Pressable>
   );
 }
 

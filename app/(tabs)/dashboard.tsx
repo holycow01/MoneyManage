@@ -953,21 +953,42 @@ function AccountCard({
       >
         {formatAmount(account.balance, currency)}
       </Text>
-      <View style={{ height: 32, marginTop: 4 }}>
-        <CartesianChart
-          data={account.sparkline.map((p, i) => ({ i, v: p.value }))}
-          xKey="i"
-          yKeys={["v"]}
-        >
-          {({ points }) => (
-            <Line
-              points={points.v}
-              color={account.color}
-              strokeWidth={1.5}
-              curveType="cardinal"
-            />
-          )}
-        </CartesianChart>
+      <View style={{ height: 32, marginTop: 4, justifyContent: "center" }}>
+        {(() => {
+          const vals = account.sparkline
+            .map((p) => p.value)
+            .filter((v) => Number.isFinite(v));
+          const flat =
+            vals.length < 2 || Math.max(...vals) === Math.min(...vals);
+          if (flat) {
+            return (
+              <View
+                style={{
+                  height: 1.5,
+                  backgroundColor: account.color,
+                  opacity: 0.4,
+                  borderRadius: 1,
+                }}
+              />
+            );
+          }
+          return (
+            <CartesianChart
+              data={account.sparkline.map((p, i) => ({ i, v: p.value }))}
+              xKey="i"
+              yKeys={["v"]}
+            >
+              {({ points }) => (
+                <Line
+                  points={points.v}
+                  color={account.color}
+                  strokeWidth={1.5}
+                  curveType="cardinal"
+                />
+              )}
+            </CartesianChart>
+          );
+        })()}
       </View>
     </View>
   );
