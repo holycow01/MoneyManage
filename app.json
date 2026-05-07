@@ -7,6 +7,7 @@
     "scheme": "pulse",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "icon": "./assets/icon.png",
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -19,6 +20,10 @@
     },
     "android": {
       "package": "com.pulse.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#09090b"
+      },
       "permissions": [
         "android.permission.USE_BIOMETRIC",
         "android.permission.USE_FINGERPRINT"
@@ -36,7 +41,8 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#09090b",
-          "resizeMode": "contain"
+          "resizeMode": "contain",
+          "image": "./assets/splash-icon.png"
         }
       ],
       [
@@ -50,7 +56,8 @@
         {
           "color": "#10b981"
         }
-      ]
+      ],
+      "expo-quick-actions"
     ],
     "experiments": {
       "typedRoutes": true

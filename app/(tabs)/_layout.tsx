@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import * as Haptics from "expo-haptics";
+import { useQuickActionRouting } from "expo-quick-actions/router";
 import {
   CalendarDays,
   LayoutGrid,
@@ -12,6 +13,8 @@ const EMERALD = "#10b981";
 const ZINC_400 = "#a1a1aa";
 
 export default function TabsLayout() {
+  useQuickActionRouting();
+
   return (
     <Tabs
       screenOptions={{
